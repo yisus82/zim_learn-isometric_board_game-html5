@@ -3,17 +3,16 @@
 
   <head>
     <meta charset="utf-8" />
-    <title>ZIM - Code Creativity</title>
-
+    <title>Isometric board game</title>
     <script type="module">
-      import zim from "https://zimjs.org/cdn/017/zim";
+      import zim from "https://zimjs.org/cdn/017/zim_game";
 
-      // See Docs under Frame for FIT, FILL, FULL, and TAG
       new Frame(FIT, 1024, 768, light, dark, ready);
       function ready() {
-        new Circle(100, purple)
-          .center()
-          .drag();
+        const board = new Board({
+          backgroundColor: grey,
+          indicatorBorderColor: light,
+        }).center();
       }
     </script>
     <meta name="viewport" content="width=device-width, user-scalable=no" />
