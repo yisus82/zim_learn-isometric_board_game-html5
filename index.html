@@ -7,6 +7,9 @@
     <script type="module">
       import zim from "https://zimjs.org/cdn/017/zim_game";
 
+      const OBSTACLE = "0";
+      const LIGHT = "1";
+
       new Frame(FIT, 1024, 768, black, dark, ready);
 
       function ready() {
@@ -28,6 +31,18 @@
           .pos(40, 40, RIGHT, BOTTOM);
         new Label("To pass, reveal the orbs in this order", 40, null, purple)
           .loc(70, 690);
+
+        const colors = shuffle(correctColors.array);
+        const positions = [[1, 1], [5, 2], [6, 6], [2, 7], [3, 4]];
+        loop(colors, (color, i) => {
+          const cover = new Rectangle(70, 70, silver);
+          const lantern = new Container(cover.width, cover.height);
+          cover.addTo(lantern);
+          lantern.reg(CENTER, lantern.height - 30).sca(.5);
+          lantern.cover = cover;
+          lantern.orb = new Orb(cover.width * .3, color);
+          board.add(lantern, positions[i][0], positions[i][1], LIGHT);
+        });
       }
     </script>
     <meta name="viewport" content="width=device-width, user-scalable=no" />
