@@ -59,6 +59,8 @@
           board.setColor(tile, dark);
           board.setData(tile, OBSTACLE);
         });
+
+        board.addKeys(player, "arrows", { notData: [OBSTACLE, LANTERN] });
       }
 
       function ready() {
