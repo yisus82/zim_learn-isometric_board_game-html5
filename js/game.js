@@ -2,6 +2,54 @@
 const OBSTACLE = 'obstacle';
 const LANTERN = 'lantern';
 
+const easyStar = new EasyStar.js();
+let pathID;
+let ticker;
+let path;
+
+const getPath = (player, board, followPath = false) => {
+  // Default empty tile has data "x"
+  easyStar.setAcceptableTiles(['x']);
+
+  // Set the grid for the AI
+  easyStar.setGrid(board.data);
+
+  // Cancel any previous path and ticker
+  easyStar.cancelPath(pathID);
+  if (ticker) {
+    Ticker.remove(ticker);
+  }
+
+  if (!board.currentTile) {
+    board.clearPath();
+    path = null;
+    return;
+  }
+
+  // Get a path from the player to the currentTile
+  pathID = easyStar.findPath(
+    player.boardCol,
+    player.boardRow,
+    board.currentTile.boardCol,
+    board.currentTile.boardRow,
+    // The callback function when path is found
+    pathFound => {
+      path = pathFound;
+      Ticker.remove(ticker);
+      board.showPath(path);
+      if (followPath) {
+        board.followPath(player, path);
+        path = null;
+      }
+    }
+  );
+
+  // Must calculate the path in a Ticker
+  ticker = Ticker.add(() => {
+    easyStar.calculate();
+  });
+};
+
 const startGame = () => {
   const board = new Board({
     backgroundColor: grey,
@@ -116,6 +164,33 @@ const startGame = () => {
   });
 
   board.addKeys(player, 'arrows', { notData: [OBSTACLE, LANTERN] });
+
+  // It happens when rolled over square changes
+  board.on('change', () => {
+    if (player.moving) {
+      return;
+    }
+
+    getPath(player, board);
+  });
+
+  board.tiles.tap(() => {
+    if (player.moving) {
+      return;
+    }
+
+    // If it was rolled over already
+    if (path) {
+      board.followPath(player, path);
+      path = null;
+      // It could happen when tapping or on mobile with no rollover
+    } else {
+      getPath(player, board, true);
+    }
+
+    // Update the stage
+    S.update();
+  });
 };
 
 const ready = () => {
