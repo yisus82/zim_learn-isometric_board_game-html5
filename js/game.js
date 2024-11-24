@@ -212,6 +212,17 @@ const startGame = () => {
 
   let correctOrbs = [];
 
+  const timer = new Timer({
+    down: false,
+    time: 0,
+    color: white,
+    backgroundColor: purple,
+    isometric: RIGHT,
+  })
+    .sca(0.8)
+    .alp(0.7)
+    .pos(70, 40, RIGHT, TOP);
+
   board.tiles.tap(() => {
     const tile = board.currentTile;
     const item = board.getItems(tile)[0];
@@ -235,6 +246,7 @@ const startGame = () => {
 
             if (correctOrbs.length == colors.length) {
               // End game
+              timer.stop();
               timeout(1.5, () => {
                 STYLE = {
                   backdropColor: black.toAlpha(0.9),
@@ -242,7 +254,7 @@ const startGame = () => {
                 };
                 new Pane({
                   content: new Label({
-                    text: 'You Shall Pass',
+                    text: 'You Shall Pass\nTime: ' + timer.time,
                     size: 70,
                     color: yellow,
                   }).noMouse(),
