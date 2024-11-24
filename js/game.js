@@ -56,7 +56,13 @@ const startGame = () => {
     indicatorBorderColor: light,
   }).center();
 
-  const player = new Person();
+  // We are going to flip the player using its scale in the X
+  // but the isometric board automatically scales the player for depth
+  // so add the pic to a container and flip the pic inside the container
+  // and the isometric board will scale the container
+  const pic = new Pic('person.png');
+  const player = new Container(pic.width, pic.height).reg(CENTER, pic.height - 30).sca(0.5);
+  pic.centerReg(player);
   board.add(player, 3, 0);
 
   const transparentTreePositions = [
@@ -167,6 +173,24 @@ const startGame = () => {
   });
 
   board.addKeys(player, 'arrows', { notData: [OBSTACLE, LANTERN] });
+
+  // Flip player depending on the direction
+  F.on('keydown', e => {
+    if (e.key == 'ArrowRight' || e.key == 'ArrowUp') {
+      pic.sca(-1, 1);
+    } else if (e.key == 'ArrowLeft' || e.key == 'ArrowDown') {
+      pic.sca(1, 1);
+    }
+    S.update();
+  });
+  player.on('movingstart', e => {
+    if (e.dir == 'right' || e.dir == 'up') {
+      pic.sca(-1, 1);
+    } else if (e.dir == 'left' || e.dir == 'down') {
+      pic.sca(1, 1);
+    }
+    S.update();
+  });
 
   // It happens when rolled over square changes
   board.on('change', () => {
@@ -305,6 +329,9 @@ const ready = () => {
   }).show(startGame);
 };
 
+const assets = ['person.png', 'lantern.png', 'gf_Macondo Swash Caps'];
+const assetsPath = 'https://zimjs.org/assets/';
+
 new Frame({
   scaling: FIT,
   width: 1024,
@@ -312,4 +339,6 @@ new Frame({
   color: 'black',
   outerColor: dark,
   ready,
+  assets,
+  path: assetsPath,
 });
