@@ -51,6 +51,13 @@ const getPath = (player, board, followPath = false) => {
 };
 
 const startGame = () => {
+  new Label({
+    text: 'Orbs of Order',
+    size: 70,
+    font: 'Macondo Swash Caps',
+    color: purple,
+  }).loc(30, 30);
+
   const board = new Board({
     backgroundColor: grey,
     indicatorBorderColor: light,
@@ -98,6 +105,7 @@ const startGame = () => {
   new Label({
     text: 'To pass, reveal the orbs in this order',
     size: 40,
+    font: 'Macondo Swash Caps',
     color: 'purple',
   }).loc({
     x: 70,
@@ -280,6 +288,7 @@ const startGame = () => {
                   content: new Label({
                     text: 'You Shall Pass\nTime: ' + timer.time,
                     size: 70,
+                    font: 'Macondo Swash Caps',
                     color: yellow,
                   }).noMouse(),
                   backgroundColor: purple,
@@ -323,6 +332,7 @@ const ready = () => {
     content: new Label({
       text: 'Welcome clever traveler!',
       size: 70,
+      font: 'Macondo Swash Caps',
       color: 'yellow',
     }).noMouse(),
     backgroundColor: purple,
