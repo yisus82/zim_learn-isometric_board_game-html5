@@ -98,7 +98,7 @@ const startGame = () => {
     y: 690,
   });
 
-  const colors = shuffle(correctColors.array);
+  const colors = shuffle([...correctColors.array]);
   const lanternPositions = [
     [1, 1],
     [5, 2],
@@ -112,17 +112,20 @@ const startGame = () => {
       height: 70,
       color: silver,
     });
+    const orb = new Orb({
+      radius: cover.width * 0.3,
+      color,
+    });
     const lantern = new Container({
       width: cover.width,
       height: cover.height,
     });
     cover.addTo(lantern);
+    orb.center(lantern);
     lantern.reg(CENTER, lantern.height - 30).sca(0.5);
     lantern.cover = cover;
-    lantern.orb = new Orb({
-      radius: cover.width * 0.3,
-      color,
-    });
+    lantern.orb = orb;
+    lantern.orb.vis(false);
     board.add(lantern, lanternPositions[i][0], lanternPositions[i][1], LANTERN);
   });
 
@@ -190,6 +193,89 @@ const startGame = () => {
 
     // Update the stage
     S.update();
+  });
+
+  const emitter = new Emitter({
+    obj: new Poly({
+      radius: {
+        min: 20,
+        max: 30,
+      },
+      sides: [7, 6],
+      pointSize: 0.7,
+      color: [silver, light, lighter],
+    }),
+    force: 2,
+    gravity: 5,
+    startPaused: true,
+  });
+
+  let correctOrbs = [];
+
+  board.tiles.tap(() => {
+    const tile = board.currentTile;
+    const item = board.getItems(tile)[0];
+
+    // Lantern without orb showing
+    if (item && !item.orb.visible) {
+      const tilesAround = board.getTilesAround(tile);
+      loop(tilesAround, tile => {
+        // If player is here, reveal orb
+        if (tile === player.boardTile) {
+          // Remove the cover
+          item.cover.vis(false);
+          // Show the orb
+          item.orb.vis(true);
+          // Update the stage
+          S.update();
+
+          if (item.orb.color == correctColors.array[correctOrbs.length]) {
+            emitter.loc(item).mov(0, -40).spurt(16);
+            correctOrbs.push(item);
+
+            if (correctOrbs.length == colors.length) {
+              // End game
+              timeout(1.5, () => {
+                STYLE = {
+                  backdropColor: black.toAlpha(0.9),
+                  align: CENTER,
+                };
+                new Pane({
+                  content: new Label({
+                    text: 'You Shall Pass',
+                    size: 70,
+                    color: yellow,
+                  }).noMouse(),
+                  backgroundColor: purple,
+                }).show(() => {
+                  location.reload();
+                });
+              });
+            }
+          } else {
+            timeout(1.5, () => {
+              item.cover.vis(true);
+              item.orb.vis(false);
+              S.update();
+              loop({
+                obj: correctOrbs,
+                call: item => {
+                  item.cover.vis(true);
+                  item.orb.vis(false);
+                  S.update();
+                },
+                reverse: true,
+                interval: 0.5,
+                immediate: false,
+                complete: () => {
+                  correctOrbs = [];
+                },
+              });
+            });
+          }
+        }
+      });
+    }
   });
 };
 
