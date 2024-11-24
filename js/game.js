@@ -121,11 +121,7 @@ const startGame = () => {
     [3, 4],
   ];
   loop(colors, (color, i) => {
-    const cover = new Rectangle({
-      width: 70,
-      height: 70,
-      color: silver,
-    });
+    const cover = new Pic('lantern.png');
     const orb = new Orb({
       radius: cover.width * 0.3,
       color,
